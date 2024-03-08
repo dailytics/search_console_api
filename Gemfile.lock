@@ -1,0 +1,21 @@
+PATH
+  remote: .
+  specs:
+    search_console_api (0.0.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    minitest (5.16.3)
+    rake (13.0.6)
+
+PLATFORMS
+  arm64-darwin-21
+
+DEPENDENCIES
+  minitest (~> 5.16.3)
+  rake (~> 13.0.6)
+  search_console_api!
+
+BUNDLED WITH
+   2.3.26
