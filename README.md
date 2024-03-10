@@ -2,45 +2,79 @@
 This is a simple wrapper to interact with the Google Search Console API with Ruby.
 It's based on the [Official API reference](https://developers.google.com/webmaster-tools/v1/api_reference_index).
 
+The first version is intended for read access only, not adding sites, sitemaps, etc.
+
 ## Usage
 Add this gem to your Gemfile:
 ```rb
 gem 'search_console_api'
 ```
 
-You will need a way to get a user's valid (and fresh) token (I personally use the `gem omnioauth`), and then:
+You will need a way to get a user's valid (and fresh) token (I personally use the `gem omnioauth`).
+Make sure you added the following scope:
+
+```
+https://www.googleapis.com/auth/webmasters.readonly
+```
 
 ### Initialize a Client
 ```rb
 client = SearchConsoleApi::Client.new(token)
+```
+
+### List all the sites
+```rb
 # List all the sites
 sites = client.sites
+=>
+[#<SearchConsoleApi::Objects::Site:0x0000000109194e98 @permission_level="siteOwner", @site_url="https://dailytics.com/">,
+ #<SearchConsoleApi::Objects::Site:0x0000000109194e48 @permission_level="siteUnverifiedUser", @site_url="http://www.anothersite.com/">,
+ #<SearchConsoleApi::Objects::Site:0x0000000109194e20 @permission_level="siteOwner", @site_url="sc-domain:anothersite2.com">,
+ #<SearchConsoleApi::Objects::Site:0x0000000109194df8 @permission_level="siteOwner", @site_url="sc-domain:anothersite3.com">]
+ my_site = sites[0]
 ```
+The response will be an array of `SearchConsoleApi::Objects::Site` objects, you will need to set one of them as a variable (let's call it `my_site`)
+for the next step.
 
 ### Search Analytics API
+The `query` method will receive the `site` parameter plus all the allowed parameters according to the [Google documentation](https://developers.google.com/webmaster-tools/v1/api_reference_index).
+The 2 required parameters are `start_date` and `end_date`.
+You will probably want to add the `dimensions` parameters (like in the second example).
 ```rb
-# prepare the most basic query:
-query = SearchConsoleApi::Query.new(
-  start_date: Date.parse("2024/01/01"),
-  end_date: Date.parse("2024/01/31")
-)
+# a basic query:
+response = client.query(site: my_site, start_date: "2024/03/01", end_date: "2024/04/01")
+=> [#<SearchConsoleApi::Objects::QueryResponseRow:0x000000010929d510 @clicks=69, @ctr=0.04542462146148782, @impressions=1519, @keys=nil, @position=15.596445029624753>]
 
-# or prepare a complex query
-query = SearchConsoleApi::Query.new(
-  start_date: Date.parse("2024/01/01"),
-  end_date: Date.parse("2024/01/31"),
-  dimensions: %w[country device page query searchAppearance], # These are all the supported values.
-  type: "web", # Supported values: discover, googleNews, news, image, video, web. Default value is "web".
-  dimension_filter_groups: [],
-  aggregation_type: "auto", # Supported values: auto, byNewsShowcasePanel, byPage, byProperty. Default value is "auto".
-  row_limit: 1000, # Supported values: between 1 and 25000. Default value is 1000.
-  start_row: 0,
-  data_state: "all" # Supported values: all, final.
-)
-
-response = client.run_query(query)
-
+# a more compled query:
+response = client.query(site: my_site, start_date: "2024/03/01", end_date: "2024/04/01", dimensions: ["query"], row_limit: 3)
+=>
+[#<SearchConsoleApi::Objects::QueryResponseRow:0x0000000109324c18
+  @clicks=7,
+  @ctr=0.21212121212121213,
+  @impressions=33,
+  @keys=["crew release form"],
+  @position=2.0606060606060606,
+  @query="crew release form">,
+ #<SearchConsoleApi::Objects::QueryResponseRow:0x0000000109324b78
+  @clicks=3,
+  @ctr=0.16666666666666666,
+  @impressions=18,
+  @keys=["filming notice template"],
+  @position=1.5,
+  @query="filming notice template">,
+ #<SearchConsoleApi::Objects::QueryResponseRow:0x0000000109324ad8
+  @clicks=3,
+  @ctr=0.10714285714285714,
+  @impressions=28,
+  @keys=["location agreement template"],
+  @position=5.392857142857143,
+  @query="location agreement template">]
 ```
+
+The response will be an array of `SearchConsoleApi::Objects::QueryResponseRow` objects, representing each row of the original response.
+In case you added the `dimensions` parameter, each `QueryResponseRow` object will have the same dimensions as attributes for a
+simpler manipulation.
+
 
 ## Development
 
