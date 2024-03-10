@@ -10,18 +10,16 @@ module SearchConsoleApi
     end
 
     def sites
-      @sites ||= SearchConsoleApi::Site.parse_list(get("/sites"))
+      @sites ||= Resources::Sites::List.new(access_token: @access_token).call
     end
 
-    def run_query(site, query)
-
+    def query(site:, start_date:, end_date:, dimensions: [], type: nil, dimension_filter_groups: [], aggregation_type: nil, row_limit: nil, start_row: nil, data_state: nil)
+      Resources::SearchAnalytics::Query.new(
+        access_token: @access_token, site: site, start_date: start_date, end_date: end_date,
+        dimensions: dimensions, type: type, dimension_filter_groups: dimension_filter_groups,
+        aggregation_type: aggregation_type, row_limit: row_limit, start_row: start_row,
+        data_state: data_state
+      ).call
     end
-
-    private
-
-    def get(path, params = {})
-      Request.get(access_token: @access_token, path: path, params: params).body
-    end
-
   end
 end

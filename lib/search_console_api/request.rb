@@ -2,6 +2,7 @@
 
 require "net/http"
 require "uri"
+require "json"
 
 module SearchConsoleApi
   class Request
@@ -13,7 +14,7 @@ module SearchConsoleApi
       url += "?#{URI.encode_www_form params}" unless params.empty?
       uri = URI(url)
 
-      response = Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
+      response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
         request = Net::HTTP::Get.new uri
         request["Authorization"] = "Bearer #{access_token}"
         request["Content-Type"] = "application/json"
@@ -22,7 +23,7 @@ module SearchConsoleApi
       end
       raise SearchConsoleApi::Error.new(response) unless response.is_a?(Net::HTTPSuccess)
 
-      response
+      JSON.parse response.body
     end
 
     def self.post(access_token:, path:, payload: nil)
@@ -39,7 +40,7 @@ module SearchConsoleApi
       response = https.request(request)
       raise SearchConsoleApi::Error.new(response) unless response.is_a?(Net::HTTPSuccess)
 
-      response.read_body
+      JSON.parse response.body
     end
 
   end
