@@ -1,3 +1,5 @@
+require "date"
+
 module SearchConsoleApi
   module Resources
     module SearchAnalytics
@@ -5,8 +7,8 @@ module SearchConsoleApi
         def initialize(access_token:, site: nil, start_date: nil, end_date: nil, dimensions: [], type: nil, dimension_filter_groups: [], aggregation_type: nil, row_limit: nil, start_row: nil, data_state: nil)
           @access_token = access_token
           @site = site
-          @start_date = start_date
-          @end_date = end_date
+          @start_date = DateTime.parse(start_date).strftime("%Y-%m-%d")
+          @end_date = DateTime.parse(end_date).strftime("%Y-%m-%d")
           @dimensions = dimensions
           @type = type
           @dimension_filter_groups = dimension_filter_groups

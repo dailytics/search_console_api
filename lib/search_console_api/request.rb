@@ -21,7 +21,7 @@ module SearchConsoleApi
 
         http.request request
       end
-      raise SearchConsoleApi::Error.new(response) unless response.is_a?(Net::HTTPSuccess)
+      raise SearchConsoleApi::Error.new(response.body) unless response.is_a?(Net::HTTPSuccess)
 
       JSON.parse response.body
     end
@@ -38,7 +38,7 @@ module SearchConsoleApi
       request.body = payload
 
       response = https.request(request)
-      raise SearchConsoleApi::Error.new(response) unless response.is_a?(Net::HTTPSuccess)
+      raise SearchConsoleApi::Error.new(response.body) unless response.is_a?(Net::HTTPSuccess)
 
       JSON.parse response.body
     end
