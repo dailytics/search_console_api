@@ -14,6 +14,10 @@ module SearchConsoleApi
           @row_limit = row_limit
           @start_row = start_row
           @data_state = data_state
+
+          unless @site.is_a?(SearchConsoleApi::Objects::Site)
+            @site = SearchConsoleApi::Objects::Site.new({"siteUrl" => @site})
+          end
         end
 
         def call
@@ -22,12 +26,16 @@ module SearchConsoleApi
           end
         end
 
+        def request_path
+          "/sites/#{@site.encoded_site_url}/searchAnalytics/query"
+        end
+
         private
 
         def response
           Request.post(
             access_token: @access_token,
-            path: "/sites/#{@site.encoded_site_url}/searchAnalytics/query",
+            path: request_path,
             payload: payload
           )
         end

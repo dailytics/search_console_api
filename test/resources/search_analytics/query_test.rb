@@ -40,4 +40,15 @@ class ResourcesSearchAnalyticsQueryTest < Minitest::Test
       assert_nil rows.first.device
     end
   end
+
+  def test_call_with_site_object
+    site = SearchConsoleApi::Objects::Site.new({"siteUrl" => "https://example.com"})
+    api = SearchConsoleApi::Resources::SearchAnalytics::Query.new(access_token: "abcd", site: site, start_date: "2024-03-01", end_date: "2024-04-01")
+    assert_equal "/sites/https%3A%2F%2Fexample.com/searchAnalytics/query", api.request_path
+  end
+
+  def test_call_with_site_url
+    api = SearchConsoleApi::Resources::SearchAnalytics::Query.new(access_token: "abcd", site: "https://example.com", start_date: "2024-03-01", end_date: "2024-04-01")
+    assert_equal "/sites/https%3A%2F%2Fexample.com/searchAnalytics/query", api.request_path
+  end
 end
