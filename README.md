@@ -45,7 +45,7 @@ You will probably want to add the `dimensions` parameters (like in the second ex
 response = client.query(site: my_site, start_date: "2024/03/01", end_date: "2024/04/01")
 => [#<SearchConsoleApi::Objects::QueryResponseRow:0x000000010929d510 @clicks=69, @ctr=0.04542462146148782, @impressions=1519, @keys=nil, @position=15.596445029624753>]
 
-# a more compled query:
+# a more complex query:
 response = client.query(site: my_site, start_date: "2024/03/01", end_date: "2024/04/01", dimensions: ["query"], row_limit: 3)
 =>
 [#<SearchConsoleApi::Objects::QueryResponseRow:0x0000000109324c18
@@ -69,6 +69,9 @@ response = client.query(site: my_site, start_date: "2024/03/01", end_date: "2024
   @keys=["location agreement template"],
   @position=5.392857142857143,
   @query="location agreement template">]
+
+# You can also use a simple url instead of a Site object in the parameters:
+response = client.query(site: "https://example.com", start_date: "2024/03/01", end_date: "2024/04/01", dimensions: ["query"], row_limit: 3)
 ```
 
 The response will be an array of `SearchConsoleApi::Objects::QueryResponseRow` objects, representing each row of the original response.
