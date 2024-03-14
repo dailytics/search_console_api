@@ -7,6 +7,8 @@ module SearchConsoleApi
         end
 
         def call
+          return [] unless response["siteEntry"].is_a?(Array)
+
           response["siteEntry"].each_with_object([]) do |attrs, sites|
             sites << Objects::Site.new(attrs)
           end
@@ -15,7 +17,7 @@ module SearchConsoleApi
         private
 
         def response
-          Request.get(access_token: @access_token, path: "/sites")
+          @response ||= Request.get(access_token: @access_token, path: "/sites")
         end
       end
     end

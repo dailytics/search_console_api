@@ -11,6 +11,7 @@ class ResourcesSitesListTest < Minitest::Test
       {"siteUrl" => "https://example.com", "permissionLevel" => "siteOwner"},
       {"siteUrl" => "https://example2.com", "permissionLevel" => "siteOwner"}
     ]})
+    @success_response_empty = {}
   end
 
   def test_call_with_one_site
@@ -30,6 +31,14 @@ class ResourcesSitesListTest < Minitest::Test
       assert_equal "siteOwner", sites.first.permission_level
       assert_equal "https://example2.com", sites.last.site_url
       assert_equal "siteOwner", sites.last.permission_level
+    end
+  end
+
+  def test_returns_empty_array_when_response_is_empty
+    api = SearchConsoleApi::Resources::Sites::List.new(access_token: "abcd")
+    api.stub(:response, @success_response_empty) do
+      sites = api.call
+      assert_equal [], sites
     end
   end
 end

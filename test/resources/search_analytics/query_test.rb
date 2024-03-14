@@ -14,6 +14,7 @@ class ResourcesSearchAnalyticsQueryTest < Minitest::Test
       {"keys" => ["foo", "2024-03-02"], "clicks" => 7, "impressions" => 180, "ctr" => 0.04, "position" => 4.7},
       {"keys" => ["bar", "2024-03-01"], "clicks" => 6, "impressions" => 180, "ctr" => 0.03, "position" => 16}
     ]})
+    @success_response_empty = {}
   end
 
   def test_call_with_no_dimensions
@@ -41,6 +42,14 @@ class ResourcesSearchAnalyticsQueryTest < Minitest::Test
     end
   end
 
+  def test_returns_empty_array_when_response_is_empty
+    api = SearchConsoleApi::Resources::SearchAnalytics::Query.new(access_token: "abcd", start_date: "2024-03-01", end_date: "2024-04-01")
+    api.stub(:response, @success_response_empty) do
+      rows = api.call
+      assert_equal [], rows
+    end
+  end
+
   def test_call_with_site_object
     site = SearchConsoleApi::Objects::Site.new({"siteUrl" => "https://example.com"})
     api = SearchConsoleApi::Resources::SearchAnalytics::Query.new(access_token: "abcd", site: site, start_date: "2024-03-01", end_date: "2024-04-01")
@@ -51,4 +60,6 @@ class ResourcesSearchAnalyticsQueryTest < Minitest::Test
     api = SearchConsoleApi::Resources::SearchAnalytics::Query.new(access_token: "abcd", site: "https://example.com", start_date: "2024-03-01", end_date: "2024-04-01")
     assert_equal "/sites/https%3A%2F%2Fexample.com/searchAnalytics/query", api.request_path
   end
+
+
 end

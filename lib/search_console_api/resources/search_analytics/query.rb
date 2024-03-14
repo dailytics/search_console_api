@@ -23,6 +23,8 @@ module SearchConsoleApi
         end
 
         def call
+          return [] unless response["rows"].is_a?(Array)
+
           response["rows"].each_with_object([]) do |attrs, rows|
             rows << Objects::QueryResponseRow.new(attrs, @dimensions)
           end
@@ -35,7 +37,7 @@ module SearchConsoleApi
         private
 
         def response
-          Request.post(
+          @response ||= Request.post(
             access_token: @access_token,
             path: request_path,
             payload: payload
